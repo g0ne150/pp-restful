@@ -1,7 +1,7 @@
 package io_test
 
 import (
-	"pinpoint-restful/thrift/io"
+	"pp-restful/thrift/io"
 	"testing"
 )
 

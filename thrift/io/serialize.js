@@ -1,19 +1,4 @@
-/*
- * Copyright 2017 dmb.star-net.cn
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
+// reference from https://github.com/peaksnail/pinpoint-node-agent
 'use strict';
 var DefaultTBaseLocator = require('./default_tbase_locator.js').DefaultTBaseLocator;
 var thrift = require('thrift');
@@ -24,20 +9,20 @@ var TFramedTransport = thrift.TFramedTransport;
 
 var Serialize = function () {
 
-    var pri = { 
-    
-        locator : null,
-        header : null,
-        transport : null,
-        protocol : null
-    
+    var pri = {
+
+        locator: null,
+        header: null,
+        transport: null,
+        protocol: null
+
     };
 
     var pub = {
 
-        serialize : function (tbase) {
+        serialize: function (tbase) {
 
-            pri.locator = new DefaultTBaseLocator(); 
+            pri.locator = new DefaultTBaseLocator();
             pri.header = pri.locator.headerLookup(tbase);
             pri.transport = new TFramedTransport();
             pri.protocol = new TCompactProtocol(pri.transport);
@@ -53,21 +38,21 @@ var Serialize = function () {
          * header protocol setting for pinpoint
          *
          */
-        headerSerialize : function (header) {
-            
+        headerSerialize: function (header) {
+
             var buffer = new Buffer(4);
             buffer.writeInt8(header.getSignature(), 0);
             buffer.writeInt8(header.getVersion(), 1);
             //type is short,16 bits
             buffer.writeUInt16BE(header.getType(), 2);
-            return buffer; 
+            return buffer;
         },
 
-        getLocator : function () {
+        getLocator: function () {
             return pri.locator;
         },
 
-        getHeader : function () {
+        getHeader: function () {
             return pri.header;
         }
 

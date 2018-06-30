@@ -1,8 +1,8 @@
 package io
 
 import (
-	"bytes"
-	"pinpoint-restful/thrift/dto/trace"
+	"errors"
+	"pp-restful/thrift/dto/trace"
 
 	"git.apache.org/thrift.git/lib/go/thrift"
 )
@@ -21,5 +21,7 @@ func Serialize(tbase trace.TSpan) (err error) {
 	TCprotocol := thrift.NewTCompactProtocol(transport)
 	tbase.Write(TCprotocol)
 
-	return bytes.NewBuffer()
+	// return bytes.NewBuffer()
+
+	return errors.New("// TODO")
 }
