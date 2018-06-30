@@ -29,4 +29,5 @@ func TestBinary(t *testing.T) {
 	fmt.Println(byte(s))
 	fmt.Println(byte(v))
 	fmt.Println(byte(hType))
+
 }

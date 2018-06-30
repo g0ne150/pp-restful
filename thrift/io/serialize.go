@@ -2,6 +2,7 @@ package io
 
 import (
 	"bytes"
+	"encoding/binary"
 	"fmt"
 
 	"git.apache.org/thrift.git/lib/go/thrift"
@@ -35,20 +36,21 @@ func Serialize(tbase thrift.TStruct) ([]byte, error) {
 	fmt.Println(headerbuff.Bytes())
 	fmt.Println(tTransport.Buffer.Bytes())
 
+	// FIXME 两个 buffer 拼接还有问题
 	headerbuff.Write(tTransport.Buffer.Bytes())
 
 	return headerbuff.Bytes(), nil
 }
 
 func HeaderSerialize(header *Header) *bytes.Buffer {
-	buff := bytes.NewBuffer(make([]byte, 4, 4))
+	buff := make([]byte, 4, 4)
 
 	// FIXME 二进制拼接还是有问题
-	buff.WriteByte(byte(header.signature))
-	buff.WriteByte(byte(header.version))
-	buff.WriteByte(byte(header.hType))
+	binary.PutVarint(buff[:1], int64(header.signature))
+	binary.PutVarint(buff[1:2], int64(header.version))
+	binary.BigEndian.PutUint16(buff[2:], header.hType)
 
-	return buff
+	return bytes.NewBuffer(buff)
 }
 
 func getLocator() *DefaultTBaseLocator {
