@@ -7,37 +7,53 @@ import (
 	"git.apache.org/thrift.git/lib/go/thrift"
 )
 
-type serializer struct {
-	locator *DefaultTBaseLocator
-	header  *Header
+type Serializer struct {
+	locator *defaultTBaseLocator
+	// header           *Header
+	tTransport       *thrift.TMemoryBuffer
+	tFramedTransport *thrift.TFramedTransport
+	protocol         *thrift.TCompactProtocol
 }
 
-var pri serializer
+func NewSerializer() *Serializer {
+	sr := &Serializer{
+		locator:    newDefaultTBaseLocator(),
+		tTransport: thrift.NewTMemoryBuffer(),
+	}
+	sr.tFramedTransport = thrift.NewTFramedTransport(sr.tTransport)
+	sr.protocol = thrift.NewTCompactProtocol(sr.tFramedTransport)
 
-func Serialize(tbase thrift.TStruct) ([]byte, error) {
-	var err error
-	pri.locator = NewDefaultTBaseLocator()
-	pri.header, err = pri.locator.HeaderLookup(tbase)
+	return sr
+}
+
+func (s Serializer) Serialize(tbase thrift.TStruct) ([]byte, error) {
+	s.tTransport.Reset()
+	header, err := s.locator.headerLookup(tbase)
 	if err != nil {
 		return nil, err
 	}
 
-	tTransport := thrift.NewTMemoryBuffer()
+	err = tbase.Write(s.protocol)
+	if err != nil {
+		return nil, err
+	}
+	err = s.tFramedTransport.Flush()
+	// err = s.tTransport.Flush()
 
-	transport := thrift.NewTFramedTransport(tTransport)
-	protocol := thrift.NewTCompactProtocol(transport)
+	if err != nil {
+		return nil, err
+	}
 
-	tbase.Write(protocol)
-	transport.Flush()
-
-	headerbuff := HeaderSerialize(pri.header)
-
-	headerbuff.Write(tTransport.Buffer.Bytes())
+	headerbuff := headerSerialize(header)
+	_, err = headerbuff.Write(s.tTransport.Buffer.Bytes())
+	if err != nil {
+		return nil, err
+	}
 
 	return headerbuff.Bytes(), nil
 }
 
-func HeaderSerialize(header *Header) *bytes.Buffer {
+func headerSerialize(header *header) *bytes.Buffer {
 	buff := make([]byte, 4)
 
 	buff[0] = byte(header.signature)
@@ -47,10 +63,12 @@ func HeaderSerialize(header *Header) *bytes.Buffer {
 	return bytes.NewBuffer(buff)
 }
 
+/*
 func getLocator() *DefaultTBaseLocator {
 	return pri.locator
 }
 
-func getHeader() *Header {
+func getHeader() *header {
 	return pri.header
 }
+*/

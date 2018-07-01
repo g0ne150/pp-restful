@@ -6,20 +6,20 @@ package io
 // }
 
 const (
-	SIGNATURE   int8 = -17
-	HEADER_SIZE      = 4
+	sIGNATURE   int8 = -17
+	hEADER_SIZE      = 4
 )
 
-type Header struct {
+type header struct {
 	signature int8
 	version   int8
 	hType     uint16
 }
 
-func NewHeader() *Header {
-	return &Header{
+func newHeader() *header {
+	return &header{
 		hType:     0,
-		signature: SIGNATURE,
+		signature: sIGNATURE,
 		version:   16,
 	}
 }

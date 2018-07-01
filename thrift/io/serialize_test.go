@@ -1,10 +1,10 @@
-package io_test
+package io
 
 import (
 	"bytes"
 	"fmt"
 	"pp-restful/thrift/dto/trace"
-	"pp-restful/thrift/io"
+
 	"testing"
 
 	"git.apache.org/thrift.git/lib/go/thrift"
@@ -15,7 +15,8 @@ func TestSerialize(t *testing.T) {
 	tSpan.ApplicationName = "application name"
 	tSpan.AgentId = "agent id"
 
-	buf, err := io.Serialize(tSpan)
+	serializer := NewSerializer()
+	buf, err := serializer.Serialize(tSpan)
 	if err != nil {
 		t.Fatal(err)
 	}

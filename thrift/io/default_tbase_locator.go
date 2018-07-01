@@ -8,28 +8,28 @@ import (
 	"git.apache.org/thrift.git/lib/go/thrift"
 )
 
-type DefaultTBaseLocator struct {
+type defaultTBaseLocator struct {
 	SPAN        uint16
-	SPAN_HEADER *Header
+	SPAN_HEADER *header
 
 	AGENT_INFO        uint16
-	AGENT_INFO_HEADER *Header
+	AGENT_INFO_HEADER *header
 
 	AGENT_STAT        uint16
-	AGENT_STAT_HEADER *Header
+	AGENT_STAT_HEADER *header
 
 	SPANCHUNK        uint16
-	SPANCHUNK_HEADER *Header
+	SPANCHUNK_HEADER *header
 
 	SPANEVENT        uint16
-	SPANEVENT_HEADER *Header
+	SPANEVENT_HEADER *header
 
 	APIMETADATA        uint16
-	APIMETADATA_HEADER *Header
+	APIMETADATA_HEADER *header
 }
 
-func NewDefaultTBaseLocator() *DefaultTBaseLocator {
-	newL := &DefaultTBaseLocator{
+func newDefaultTBaseLocator() *defaultTBaseLocator {
+	newL := &defaultTBaseLocator{
 		SPAN:        40,
 		AGENT_INFO:  50,
 		AGENT_STAT:  55,
@@ -46,13 +46,13 @@ func NewDefaultTBaseLocator() *DefaultTBaseLocator {
 	return newL
 }
 
-func createHeader(hType uint16) *Header {
-	newHeader := NewHeader()
+func createHeader(hType uint16) *header {
+	newHeader := newHeader()
 	newHeader.hType = hType
 	return newHeader
 }
 
-func (l DefaultTBaseLocator) HeaderLookup(tbase thrift.TStruct) (*Header, error) {
+func (l defaultTBaseLocator) headerLookup(tbase thrift.TStruct) (*header, error) {
 
 	if _, ok := tbase.(*trace.TSpan); ok {
 		return l.SPAN_HEADER, nil
