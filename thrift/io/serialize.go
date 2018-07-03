@@ -1,7 +1,6 @@
 package io
 
 import (
-	"bytes"
 	"encoding/binary"
 
 	"git.apache.org/thrift.git/lib/go/thrift"
@@ -45,22 +44,18 @@ func (s Serializer) Serialize(tbase thrift.TStruct) ([]byte, error) {
 	}
 
 	headerbuff := headerSerialize(header)
-	_, err = headerbuff.Write(s.tTransport.Buffer.Bytes())
-	if err != nil {
-		return nil, err
-	}
 
-	return headerbuff.Bytes(), nil
+	return append(headerbuff, s.tTransport.Buffer.Bytes()...), nil
 }
 
-func headerSerialize(header *header) *bytes.Buffer {
+func headerSerialize(header *header) []byte {
 	buff := make([]byte, 4)
 
 	buff[0] = byte(header.signature)
 	buff[1] = byte(header.version)
 	binary.BigEndian.PutUint16(buff[2:], header.hType)
 
-	return bytes.NewBuffer(buff)
+	return buff
 }
 
 /*
