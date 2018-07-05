@@ -51,8 +51,8 @@ func (s Serializer) Serialize(tbase thrift.TStruct) ([]byte, error) {
 func headerSerialize(header *header) []byte {
 	buff := make([]byte, 4)
 
-	buff[0] = byte(header.signature)
-	buff[1] = byte(header.version)
+	buff[0] = header.signature
+	buff[1] = header.version
 	binary.BigEndian.PutUint16(buff[2:], header.hType)
 
 	return buff

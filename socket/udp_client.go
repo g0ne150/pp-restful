@@ -46,7 +46,7 @@ func (c *UDPClient) send(msg thrift.TStruct) (err error) {
 		return err
 	}
 
-	// TODO implement UDP socket send serialized data
+	// TODO implement UDP socket and send serialized data
 
 	return nil
 }

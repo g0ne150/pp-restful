@@ -6,13 +6,13 @@ package io
 // }
 
 const (
-	sIGNATURE   int8 = -17
+	sIGNATURE   byte = 0xef
 	hEADER_SIZE      = 4
 )
 
 type header struct {
-	signature int8
-	version   int8
+	signature byte
+	version   byte
 	hType     uint16
 }
 
@@ -20,6 +20,6 @@ func newHeader() *header {
 	return &header{
 		hType:     0,
 		signature: sIGNATURE,
-		version:   16,
+		version:   0x10,
 	}
 }
