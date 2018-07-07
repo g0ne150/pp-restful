@@ -1,7 +1,6 @@
 package io
 
 import (
-	"bytes"
 	"encoding/binary"
 	"io/ioutil"
 
@@ -9,28 +8,23 @@ import (
 )
 
 type Serializer struct {
-	locator *defaultTBaseLocator
-	// header           *Header
-	tTransport *thrift.StreamTransport
+	locator    *defaultTBaseLocator
+	tTransport *thrift.TMemoryBuffer
 	protocol   *thrift.TCompactProtocol
 }
 
 func NewSerializer() *Serializer {
 	sr := &Serializer{
-		locator: newDefaultTBaseLocator(),
-		// tTransport: thrift.NewTMemoryBuffer(),
+		locator:    newDefaultTBaseLocator(),
+		tTransport: thrift.NewTMemoryBuffer(),
 	}
-	// sr.tFramedTransport = thrift.NewTFramedTransport(sr.tTransport)
-	// sr.tTransport = thrift.NewStreamTransportFactory().GetTransport()
-	// sr.protocol = thrift.NewTCompactProtocol(sr.tTransport)
+	sr.protocol = thrift.NewTCompactProtocol(sr.tTransport)
 
 	return sr
 }
 
 func (s Serializer) Serialize(tbase thrift.TStruct) ([]byte, error) {
-	buf := bytes.NewBuffer([]byte{})
-	s.tTransport = thrift.NewStreamTransport(buf, buf)
-	s.protocol = thrift.NewTCompactProtocol(s.tTransport)
+	s.tTransport.Reset()
 
 	header, err := s.locator.headerLookup(tbase)
 	if err != nil {
