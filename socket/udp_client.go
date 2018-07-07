@@ -1,8 +1,6 @@
 package socket
 
 import (
-	"errors"
-
 	"git.apache.org/thrift.git/lib/go/thrift"
 )
 
@@ -36,17 +34,16 @@ func (c *UDPClient) SetSerializer(serializer Serializer) {
 }
 
 func (c *UDPClient) send(msg thrift.TStruct) (err error) {
-	if c.serializer == nil {
-		return errors.New("Set serializer first before call UDPClient.send() please")
-	}
+	// if c.serializer == nil {
+	// 	return errors.New("Set serializer first before call UDPClient.send() please")
+	// }
 
-	var serializedMsg []byte
-	serializedMsg, err = c.serializer.Serialize(msg)
-	if err != nil {
-		return err
-	}
+	// serializedMsg, err := c.serializer.Serialize(msg)
+	// if err != nil {
+	// 	return err
+	// }
 
-	// TODO implement UDP socket and send serialized data
+	// // TODO implement UDP socket and send serialized data
 
 	return nil
 }

@@ -1,7 +1,9 @@
 package io
 
 import (
+	"bytes"
 	"encoding/binary"
+	"io/ioutil"
 
 	"git.apache.org/thrift.git/lib/go/thrift"
 )
@@ -9,24 +11,27 @@ import (
 type Serializer struct {
 	locator *defaultTBaseLocator
 	// header           *Header
-	tTransport       *thrift.TMemoryBuffer
-	tFramedTransport *thrift.TFramedTransport
-	protocol         *thrift.TCompactProtocol
+	tTransport *thrift.StreamTransport
+	protocol   *thrift.TCompactProtocol
 }
 
 func NewSerializer() *Serializer {
 	sr := &Serializer{
-		locator:    newDefaultTBaseLocator(),
-		tTransport: thrift.NewTMemoryBuffer(),
+		locator: newDefaultTBaseLocator(),
+		// tTransport: thrift.NewTMemoryBuffer(),
 	}
-	sr.tFramedTransport = thrift.NewTFramedTransport(sr.tTransport)
-	sr.protocol = thrift.NewTCompactProtocol(sr.tFramedTransport)
+	// sr.tFramedTransport = thrift.NewTFramedTransport(sr.tTransport)
+	// sr.tTransport = thrift.NewStreamTransportFactory().GetTransport()
+	// sr.protocol = thrift.NewTCompactProtocol(sr.tTransport)
 
 	return sr
 }
 
 func (s Serializer) Serialize(tbase thrift.TStruct) ([]byte, error) {
-	s.tTransport.Reset()
+	buf := bytes.NewBuffer([]byte{})
+	s.tTransport = thrift.NewStreamTransport(buf, buf)
+	s.protocol = thrift.NewTCompactProtocol(s.tTransport)
+
 	header, err := s.locator.headerLookup(tbase)
 	if err != nil {
 		return nil, err
@@ -36,16 +41,17 @@ func (s Serializer) Serialize(tbase thrift.TStruct) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = s.tFramedTransport.Flush()
-	// err = s.tTransport.Flush()
 
+	// err = s.tTransport.Flush()
+	err = s.tTransport.Flush()
 	if err != nil {
 		return nil, err
 	}
 
 	headerbuff := headerSerialize(header)
+	bodyBuff, _ := ioutil.ReadAll(s.tTransport)
 
-	return append(headerbuff, s.tTransport.Buffer.Bytes()...), nil
+	return append(headerbuff, bodyBuff...), nil
 }
 
 func headerSerialize(header *header) []byte {
