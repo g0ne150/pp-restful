@@ -7,45 +7,39 @@ import (
 	"git.apache.org/thrift.git/lib/go/thrift"
 )
 
-type Serializer struct {
-	locator    *defaultTBaseLocator
-	tTransport *thrift.TMemoryBuffer
-	protocol   *thrift.TCompactProtocol
+var locator *defaultTBaseLocator
+
+func init() {
+	locator = newDefaultTBaseLocator()
 }
 
-func NewSerializer() *Serializer {
-	sr := &Serializer{
-		locator:    newDefaultTBaseLocator(),
-		tTransport: thrift.NewTMemoryBuffer(),
-	}
-	sr.protocol = thrift.NewTCompactProtocol(sr.tTransport)
+func Serialize(tbase thrift.TStruct) ([]byte, error) {
+	transport := thrift.NewTMemoryBuffer()
+	protocol := thrift.NewTCompactProtocol(transport)
 
-	return sr
-}
-
-func (s Serializer) Serialize(tbase thrift.TStruct) ([]byte, error) {
-	s.tTransport.Reset()
-
-	header, err := s.locator.headerLookup(tbase)
+	header, err := locator.headerLookup(tbase)
 	if err != nil {
 		return nil, err
 	}
 
-	err = tbase.Write(s.protocol)
+	_, err = transport.Write(headerSerialize(header))
 	if err != nil {
 		return nil, err
 	}
 
-	// err = s.tTransport.Flush()
-	err = s.tTransport.Flush()
+	err = tbase.Write(protocol)
 	if err != nil {
 		return nil, err
 	}
 
-	headerbuff := headerSerialize(header)
-	bodyBuff, _ := ioutil.ReadAll(s.tTransport)
+	// transport.Flush()
 
-	return append(headerbuff, bodyBuff...), nil
+	result, err := ioutil.ReadAll(transport)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }
 
 func headerSerialize(header *header) []byte {

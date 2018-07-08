@@ -16,8 +16,7 @@ func TestSerialize(t *testing.T) {
 	tSpan.ApplicationName = "application name"
 	tSpan.AgentId = "agent id"
 
-	serializer := NewSerializer()
-	buf, err := serializer.Serialize(tSpan)
+	buf, err := Serialize(tSpan)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -28,6 +27,7 @@ func TestSerialize(t *testing.T) {
 		t.Errorf("buf length is zero")
 	}
 
+	// deserialize
 	deTSpan := trace.NewTSpan()
 	deserializer := thrift.NewTDeserializer()
 	transport := thrift.NewTMemoryBuffer()
