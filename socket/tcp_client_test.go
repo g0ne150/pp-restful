@@ -24,14 +24,14 @@ func TestConnect(t *testing.T) {
 	var applicationServiceType int16 = 1210
 	var apiId int32 = 3
 
-	tranID, _ := commons.ParseTransactionID("shark-test^1531105828927^5")
+	tranID, _ := commons.ParseTransactionID("shark-test^1531378679673^2")
 
 	tSpan := trace.NewTSpan()
 	tSpan.AgentId = "shark-test"
 	tSpan.ApplicationName = "shark-test"
-	tSpan.AgentStartTime = 1531105828927
+	tSpan.AgentStartTime = 1531378679673
 	tSpan.TransactionId = commons.WriteTransactionID(tranID.GetAgentID(), tranID.GetAgentStartTime(), tranID.GetTransactionSequence())
-	tSpan.SpanId = 524750800893365229
+	tSpan.SpanId = -9076112736953707450
 	tSpan.ParentSpanId = -1
 	tSpan.StartTime = time.Now().Unix()
 	tSpan.Elapsed = 9
@@ -49,9 +49,10 @@ func TestConnect(t *testing.T) {
 
 	fmt.Println(hex.EncodeToString(sendData))
 
-	h, _ := hex.DecodeString("000100000104")
+	// h, _ := hex.DecodeString("000100000104")
 
-	_, err = conn.Write(append(h, sendData...))
+	// _, err = conn.Write(append(h, sendData...))
+	_, err = conn.Write(sendData)
 	if err != nil {
 		t.Fatal("conn.Write data error: ", err.Error())
 	}
