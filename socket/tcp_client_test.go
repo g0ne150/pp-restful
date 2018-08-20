@@ -1,6 +1,7 @@
 package socket
 
 import (
+	"encoding/binary"
 	"encoding/hex"
 	"fmt"
 	"net"
@@ -24,12 +25,12 @@ func TestConnect(t *testing.T) {
 	var applicationServiceType int16 = 1210
 	var apiId int32 = 3
 
-	tranID, _ := commons.ParseTransactionID("shark-test^1531378679673^2")
+	tranID, _ := commons.ParseTransactionID("shark-test^1534496788335^14")
 
 	tSpan := trace.NewTSpan()
 	tSpan.AgentId = "shark-test"
 	tSpan.ApplicationName = "shark-test"
-	tSpan.AgentStartTime = 1531378679673
+	tSpan.AgentStartTime = 1534496788335
 	tSpan.TransactionId = commons.WriteTransactionID(tranID.GetAgentID(), tranID.GetAgentStartTime(), tranID.GetTransactionSequence())
 	tSpan.SpanId = -9076112736953707450
 	tSpan.ParentSpanId = -1
@@ -51,7 +52,10 @@ func TestConnect(t *testing.T) {
 
 	// h, _ := hex.DecodeString("000100000104")
 
-	// _, err = conn.Write(append(h, sendData...))
+	h := make([]byte, 2+4)
+	binary.BigEndian.PutUint16(h[:2], 1)
+	binary.BigEndian.PutUint32(h[2:], uint32(len(sendData)))
+	sendData = append(h, sendData...)
 	_, err = conn.Write(sendData)
 	if err != nil {
 		t.Fatal("conn.Write data error: ", err.Error())

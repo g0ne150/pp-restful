@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"pp-restful/thrift/dto/trace"
+	"time"
 
 	"testing"
 
@@ -15,6 +16,7 @@ func TestSerialize(t *testing.T) {
 	tSpan := trace.NewTSpan()
 	tSpan.ApplicationName = "application name"
 	tSpan.AgentId = "agent id"
+	tSpan.TransactionId = []byte(fmt.Sprintf("shark-test^%d^1", time.Now().Unix()))
 
 	buf, err := Serialize(tSpan)
 	if err != nil {
